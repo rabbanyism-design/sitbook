@@ -122,6 +122,26 @@
                         <input required type="tel" id="phone" placeholder="01XXXXXXXXX" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#F27D26] focus:border-transparent outline-none transition-all">
                     </div>
 
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2">
+                                <i data-lucide="credit-card" size="12"></i> Payment Method
+                            </label>
+                            <select id="payment-method" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#F27D26] focus:border-transparent outline-none transition-all bg-white">
+                                <option value="bkash">bKash</option>
+                                <option value="nagad">Nagad</option>
+                                <option value="bank">Bank</option>
+                                <option value="cash">Cash</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2">
+                                <i data-lucide="hash" size="12"></i> Ref Number
+                            </label>
+                            <input type="text" id="ref-number" placeholder="TrxID / Ref" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#F27D26] focus:border-transparent outline-none transition-all">
+                        </div>
+                    </div>
+
                     <div class="space-y-1.5">
                         <label class="text-xs font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2">
                             <i data-lucide="image" size="12"></i> Student Photo (Optional)
@@ -165,7 +185,7 @@
 
         <!-- Success Step -->
         <div id="step-success" class="hidden space-y-8">
-            <div class="text-center space-y-2 no-print">
+            <div class="text-center space-y-2">
                 <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <i data-lucide="check-circle-2" class="text-green-600" size="32"></i>
                 </div>
@@ -210,6 +230,17 @@
                             <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Phone Number</p>
                             <p class="font-bold text-gray-800" id="receipt-phone"></p>
                         </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-6 mb-8">
+                    <div class="space-y-1">
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Payment Method</p>
+                        <p class="font-bold text-gray-800 uppercase" id="receipt-payment"></p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Ref Number</p>
+                        <p class="font-bold text-gray-800" id="receipt-ref"></p>
                     </div>
                 </div>
 
@@ -285,6 +316,10 @@
                 <p style="margin: 2px 0;" id="pos-name"></p>
                 <p style="margin: 4px 0;"><strong>PHONE:</strong></p>
                 <p style="margin: 2px 0;" id="pos-phone"></p>
+                <p style="margin: 4px 0;"><strong>PAYMENT:</strong></p>
+                <p style="margin: 2px 0;" id="pos-payment"></p>
+                <p style="margin: 4px 0;"><strong>REF:</strong></p>
+                <p style="margin: 2px 0;" id="pos-ref"></p>
                 <p style="margin: 4px 0;"><strong>COURSE:</strong></p>
                 <p style="margin: 2px 0;" id="pos-course"></p>
             </div>
@@ -326,6 +361,8 @@
             const name = document.getElementById('name').value;
             const phone = document.getElementById('phone').value;
             const course = document.getElementById('course').value;
+            const paymentMethod = document.getElementById('payment-method').value;
+            const refNumber = document.getElementById('ref-number').value;
             const photoFile = document.getElementById('photo').files[0];
 
             // Validation
@@ -360,6 +397,8 @@
                     name,
                     phone,
                     course,
+                    paymentMethod,
+                    refNumber,
                     date,
                     amount: 1000,
                     photo: photoData
@@ -375,6 +414,8 @@
                 document.getElementById('receipt-name').innerText = name;
                 document.getElementById('receipt-phone').innerText = phone;
                 document.getElementById('receipt-course').innerText = course;
+                document.getElementById('receipt-payment').innerText = paymentMethod;
+                document.getElementById('receipt-ref').innerText = refNumber || 'N/A';
 
                 if (photoData) {
                     document.getElementById('receipt-photo').src = photoData;
@@ -388,6 +429,8 @@
                 document.getElementById('pos-date').innerText = date;
                 document.getElementById('pos-name').innerText = name.toUpperCase();
                 document.getElementById('pos-phone').innerText = phone;
+                document.getElementById('pos-payment').innerText = paymentMethod.toUpperCase();
+                document.getElementById('pos-ref').innerText = refNumber || 'N/A';
                 document.getElementById('pos-course').innerText = course.toUpperCase();
 
                 // Step 2: Success
@@ -406,6 +449,7 @@
         function printPOS() {
             const mainContent = document.getElementById('main-content');
             const header = document.querySelector('header');
+            const a4Receipt = document.getElementById('a4-receipt');
             
             // Hide everything except POS
             mainContent.classList.add('no-print');
@@ -523,7 +567,7 @@
                         ${b.photo ? `<img src="${b.photo}" class="w-10 h-10 rounded-lg object-cover">` : `<div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400"><i data-lucide="user" size="16"></i></div>`}
                         <div>
                             <p class="font-bold text-sm">${b.name}</p>
-                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">${b.id} • ${b.date}</p>
+                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">${b.id} • ${b.date} • ${b.paymentMethod.toUpperCase()} • ${b.refNumber || 'N/A'}</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
@@ -549,8 +593,8 @@
             const bookings = JSON.parse(localStorage.getItem('gsm_fix_bookings') || '[]');
             if (bookings.length === 0) return alert("No data to export");
             
-            const headers = ["ID", "Name", "Phone", "Course", "Date", "Amount"];
-            const rows = bookings.map(b => [b.id, b.name, b.phone, b.course, b.date, b.amount]);
+            const headers = ["ID", "Name", "Phone", "Course", "Payment", "Ref", "Date", "Amount"];
+            const rows = bookings.map(b => [b.id, b.name, b.phone, b.course, b.paymentMethod, b.refNumber || 'N/A', b.date, b.amount]);
             
             let csvContent = "data:text/csv;charset=utf-8," 
                 + headers.join(",") + "\n"
